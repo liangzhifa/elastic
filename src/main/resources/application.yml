@@ -1,5 +1,19 @@
 spring:
   data:
     elasticsearch:
-      cluster-name: elasticsearch
-      cluster-nodes: 127.0.0.1:9300
+      cluster-name: my-application
+      cluster-nodes: 192.168.1.193:9300
+
+  datasource:
+    url: jdbc:mysql://192.168.1.193:3306/test?useSSL=false&characterEncoding=utf8
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.jdbc.Driver
+server:
+  servlet:
+    context-path: /
+  port: 8080
+# 配置slq打印日志
+mybatis-plus:
+  mapper-locations: classpath:mapperxml/*.xml
+  typeAliasesPackage: com.zhifa.elastic.domain

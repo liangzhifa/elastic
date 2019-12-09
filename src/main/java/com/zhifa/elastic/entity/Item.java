@@ -11,7 +11,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(indexName = "item", type = "docs", shards = 1, replicas = 0)
+@Document(indexName = "item", type = "docs", shards = 1, replicas = 0,createIndex = false)
 public class Item {
     @Id
     private Long id;

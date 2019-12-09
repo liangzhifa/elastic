@@ -1,6 +1,8 @@
 package com.zhifa.elastic;
 
+import com.zhifa.elastic.domain.Info;
 import com.zhifa.elastic.entity.Item;
+import com.zhifa.elastic.repository.InfoRepository;
 import com.zhifa.elastic.repository.ItemRepository;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -33,6 +35,8 @@ public class ElasticApplicationTests {
 
     @Autowired
     private ItemRepository itemRepository;
+    @Autowired
+    private InfoRepository infoRepository;
 
     /**
      * 创建索引
@@ -43,6 +47,17 @@ public class ElasticApplicationTests {
         elasticsearchTemplate.createIndex(Item.class);
         // 配置映射，会根据Item类中的id、Field等字段来自动完成映射
         elasticsearchTemplate.putMapping(Item.class);
+    }
+
+    /**
+     * 创建索引
+     */
+    @Test
+    public void createInfoIndex() {
+        // 创建索引，会根据Item类的@Document注解信息来创建
+        elasticsearchTemplate.createIndex(Info.class);
+        // 配置映射，会根据Item类中的id、Field等字段来自动完成映射
+        elasticsearchTemplate.putMapping(Info.class);
     }
 
     /**
@@ -60,6 +75,15 @@ public class ElasticApplicationTests {
     public void insert() {
         Item item = new Item(101L, "富哥华为", "手机", "华为", 2999.00, "https://img12.360buyimg.com/n1/s450x450_jfs/t1/14081/40/4987/124705/5c371b20E53786645/c1f49cd69e6c7e6a.jpg");
         itemRepository.save(item);
+    }
+
+    /**
+     * 新增
+     */
+    @Test
+    public void insertinfo() {
+        Info info = new Info(3967l, "[韩真华]", "news.sina.com.cn/s/l/p/2008-05-31/014815653428.shtml");
+        infoRepository.save(info);
     }
 
     /**
@@ -109,6 +133,7 @@ public class ElasticApplicationTests {
         List<Item> list = itemRepository.findByPriceBetween(5000.00, 6000.00);
         list.forEach(item -> System.out.println("item = " + item));
     }
+
     /**
      * 自定义方法
      */
@@ -129,7 +154,9 @@ public class ElasticApplicationTests {
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
         // 添加基本分词查询
         queryBuilder.withQuery(QueryBuilders.matchQuery("title", "小米手机"));
+        queryBuilder.withQuery(QueryBuilders.termQuery("category", "手机"));
         // 搜索，获取结果
+        System.out.println(queryBuilder.build().toString());
         Page<Item> items = itemRepository.search(queryBuilder.build());
         // 总条数
         long total = items.getTotalElements();
