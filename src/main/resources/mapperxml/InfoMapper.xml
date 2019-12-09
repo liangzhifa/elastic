@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhifa.elastic.mapper.InfoMapper">
+  <resultMap id="BaseResultMap" type="com.zhifa.elastic.domain.Info">
+    <!--@mbg.generated-->
+    <!--@Table info-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="keyword" jdbcType="VARCHAR" property="keyword" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, keyword, url
+  </sql>
+    <select id="selectInfosBetweenid" resultMap="BaseResultMap">
+      SELECT *
+      FROM info
+      WHERE id >=#{start}
+        AND id <![CDATA[<=]]> #{end}
+      </select>
+</mapper>
