@@ -37,6 +37,7 @@ public class Policy implements Serializable {
     @TableField(value = "articleId")
     private String articleid;
 
+    //searchAnalyzer = "ik_max_word"
     @Field(type = FieldType.Text, searchAnalyzer = "ik_max_word", analyzer = "ik_max_word")
     @TableField(value = "title")
     private String title;
