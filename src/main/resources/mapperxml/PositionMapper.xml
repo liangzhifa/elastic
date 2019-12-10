@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhifa.elastic.mapper.PositionMapper">
+  <resultMap id="BaseResultMap" type="com.zhifa.elastic.domain.Position">
+    <!--@mbg.generated-->
+    <!--@Table position-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="position" jdbcType="VARCHAR" property="position" />
+    <result column="enterprise" jdbcType="VARCHAR" property="enterprise" />
+    <result column="companytext" jdbcType="LONGVARCHAR" property="companytext" />
+    <result column="url" jdbcType="LONGVARCHAR" property="url" />
+    <result column="addr" jdbcType="VARCHAR" property="addr" />
+    <result column="pricemin" jdbcType="DECIMAL" property="pricemin" />
+    <result column="pricemax" jdbcType="DECIMAL" property="pricemax" />
+    <result column="price" jdbcType="VARCHAR" property="price" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, `position`, enterprise, companytext, url, addr, pricemin, pricemax, price
+  </sql>
+</mapper>

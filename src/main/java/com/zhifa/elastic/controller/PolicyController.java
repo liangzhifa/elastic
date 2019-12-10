@@ -72,10 +72,13 @@ public class PolicyController {
         //QueryBuilders.wildcardQuery("fieldName","ctr*");//前面是fieldname，后面是带匹配字符的字符串
         //QueryBuilders.wildcardQuery("fieldName","c?r?");
         //builder.should(QueryBuilders.wildcardQuery("title", "*"+data+"*").boost(100));
+
         builder.should(QueryBuilders.queryStringQuery(data).field("title").boost(2f));
+        //builder.should(QueryBuilders.);
         builder.should(QueryBuilders.queryStringQuery(data).field("content").boost(1f));
        // builder.should(QueryBuilders.queryStringQuery(data).field("content").boost(1));
         //builder.should(QueryBuilders.wildcardQuery("title", data).boost(100));
+        //builder.filter(QueryBuilders.)
         //添加查询的字段内容
         String[] fileds = {"title", "content"};
 
@@ -83,7 +86,7 @@ public class PolicyController {
 
 
         // 高亮设置
-        List<String> highlightFields = new ArrayList<String>();
+        /*List<String> highlightFields = new ArrayList<String>();
         highlightFields.add("title");
         highlightFields.add("content");
         HighlightBuilder.Field[] fields = new HighlightBuilder.Field[highlightFields.size()];
@@ -94,7 +97,7 @@ public class PolicyController {
         HighlightBuilder.Field highlightField = new HighlightBuilder.Field("title")
                 .preTags("<span style='color: red'>")
                 .postTags("</span>");
-
+*/
 
 
         //设置分页(从第一页开始，一页显示10条)
@@ -114,7 +117,7 @@ public class PolicyController {
         NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
         //将搜索条件设置到构建中
         nativeSearchQueryBuilder.withQuery(builder);
-        nativeSearchQueryBuilder.withHighlightFields(fields);
+        //nativeSearchQueryBuilder.withHighlightFields(fields);
         //nativeSearchQueryBuilder.withSort(publishSort);
         nativeSearchQueryBuilder.withSort(SortBuilders.scoreSort().order(SortOrder.DESC));
         nativeSearchQueryBuilder.withSort(SortBuilders.fieldSort("publish").order(SortOrder.DESC));
@@ -134,7 +137,7 @@ public class PolicyController {
         System.out.println(string);
 
         //获得首次查询结果
-        AggregatedPage<Policy> policies = elasticsearchTemplate.queryForPage(query, Policy.class, new SearchResultMapper() {
+       /* AggregatedPage<Policy> policies = elasticsearchTemplate.queryForPage(query, Policy.class, new SearchResultMapper() {
             @Override
             public <T> AggregatedPage<T> mapResults(SearchResponse response, Class<T> aClass, Pageable pageable) {
                 List<Policy> list = new ArrayList<>();
@@ -167,7 +170,7 @@ public class PolicyController {
         });
         List<Policy> content = policies.getContent();
         return content;
-
+*/
         /*System.out.println("命中总数量:"+response.getHits().getTotalHits());
         SearchHits hits = response.getHits();
 */
@@ -184,7 +187,7 @@ public class PolicyController {
 
 
 
-       // Page<Policy> policyPage = policyRepository.search(query);
+        Page<Policy> policyPage = policyRepository.search(query);
 
        // List<Policy> policies = policyPage.get().collect(Collectors.toList());
 
@@ -213,7 +216,7 @@ public class PolicyController {
 
 
 
-       // return policyPage;
+        return policyPage;
 
     }
 

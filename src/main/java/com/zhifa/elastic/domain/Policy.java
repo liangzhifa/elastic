@@ -56,7 +56,7 @@ public class Policy implements Serializable {
     @TableField(value = "type")
     private String type;
 
-    @Field(type = FieldType.Text, searchAnalyzer = "ik_max_word", analyzer = "ik_max_word")
+    @Field(type = FieldType.Text, searchAnalyzer = "ik_smart", analyzer = "ik_smart")
     @TableField(value = "content")
     private String content;
 
