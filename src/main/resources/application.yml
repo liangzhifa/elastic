@@ -12,7 +12,7 @@ spring:
 server:
   servlet:
     context-path: /
-  port: 8080
+  port: 80
 # 配置slq打印日志
 mybatis-plus:
   mapper-locations: classpath:mapperxml/*.xml
