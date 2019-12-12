@@ -72,10 +72,30 @@ public class PolicyController {
         //QueryBuilders.wildcardQuery("fieldName","ctr*");//前面是fieldname，后面是带匹配字符的字符串
         //QueryBuilders.wildcardQuery("fieldName","c?r?");
         //builder.should(QueryBuilders.wildcardQuery("title", "*"+data+"*").boost(100));
-
-        builder.should(QueryBuilders.queryStringQuery(data).field("title").boost(2f));
+        /**
+         * elasticsearch query中的minimum_should_match ，字面意思就很清晰了，就是最小匹配度，但是它却有很多种配置方式。
+         * 正向匹配度比如 "minimum_should_match":3 官方原文解释是：Indicates a fixed value regardless of the number of optional clauses.
+         * 这里要说明一下为什么是optional clauses（翻译为可选的子句），因为对于被analyzer分解出来的每一个term都会构造成一个should的bool query的查询,每个term变成一个term query子句。
+         * 例如"query": "how not to be"，被解析成：
+         * {
+         *   "bool": {
+         *     "should": [
+         *       { "term": { "body": "how"}},
+         *       { "term": { "body": "not"}},
+         *       { "term": { "body": "to"}},
+         *       { "term": { "body": "be"}}
+         *     ],
+         *     "minimum_should_match": 3
+         *   }
+         * }
+         * （注：在bool query中minimum_should_match只能紧跟在should的后面，放其他地方会出异常）
+         *
+         */
+        builder.should(QueryBuilders.queryStringQuery(data).field("title").minimumShouldMatch("75%").boost(2f));
         //builder.should(QueryBuilders.);
-        builder.should(QueryBuilders.queryStringQuery(data).field("content").boost(1f));
+        builder.should(QueryBuilders.queryStringQuery(data).field("content").minimumShouldMatch("75%").boost(1f));
+       /* BoolQueryBuilder b2 = QueryBuilders.boolQuery();
+        builder.should(b2);*/
        // builder.should(QueryBuilders.queryStringQuery(data).field("content").boost(1));
         //builder.should(QueryBuilders.wildcardQuery("title", data).boost(100));
         //builder.filter(QueryBuilders.)
@@ -102,7 +122,7 @@ public class PolicyController {
 
         //设置分页(从第一页开始，一页显示10条)
         //注意开始是从0开始，有点类似sql中的方法limit 的查询
-        PageRequest page = PageRequest.of(0, 20);
+        //PageRequest page = PageRequest.of(0, 20);
 
 
         //按照日期排序
@@ -123,7 +143,7 @@ public class PolicyController {
         nativeSearchQueryBuilder.withSort(SortBuilders.fieldSort("publish").order(SortOrder.DESC));
         //nativeSearchQueryBuilder.withHighlightBuilder();
         //将分页设置到构建中
-        nativeSearchQueryBuilder.withPageable(page);
+        //nativeSearchQueryBuilder.withPageable(page);
 
 
 

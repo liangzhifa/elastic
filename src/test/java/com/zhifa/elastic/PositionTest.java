@@ -55,8 +55,9 @@ public class PositionTest {
         // 配置映射，会根据Item类中的id、Field等字段来自动完成映射
         elasticsearchTemplate.putMapping(Policy.class);
     }
+
     @Test
-    public void loadToES(){
+    public void loadToES() {
         elasticsearchTemplate.deleteIndex(Position.class);
         elasticsearchTemplate.createIndex(Position.class);
         // 配置映射，会根据Item类中的id、Field等字段来自动完成映射
@@ -67,23 +68,24 @@ public class PositionTest {
     }
 
     @Test
-    public void format(){
+    public void format() {
         List<Position> positions = positionMapper.selectList(null);
+        //positionRepository.save()
         positions.forEach(position -> {
            /* String addr = position.getAddr();
             String[] split = addr.split("[ ]+");
             position.setAddr(split[0]);*/
-           String price = position.getPrice();
+            String price = position.getPrice();
             /*
             if (price.contains("天")){
                 price = "6-9K";
             }*/
-           // price=price.substring(0, price.length() - 1);
+            // price=price.substring(0, price.length() - 1);
             String[] split = price.split("-");
             position.setPricemin(Long.valueOf(split[0]));
             position.setPricemax(Long.valueOf(split[1]));
 
-           // position.setPrice(price);
+            // position.setPrice(price);
 
 
             positionMapper.updateById(position);
@@ -91,7 +93,7 @@ public class PositionTest {
     }
 
     @Test
-    public void add(){
+    public void add() {
 
     }
 
