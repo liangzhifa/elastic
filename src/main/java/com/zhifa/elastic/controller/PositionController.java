@@ -47,7 +47,7 @@ public class PositionController {
 
         //设置分页(从第一页开始，一页显示10条)
         //注意开始是从0开始，有点类似sql中的方法limit 的查询
-        //PageRequest page = PageRequest.of(0, 20);
+        PageRequest page = PageRequest.of(0, 20);
 
         //1.创建QueryBuilder(即设置查询条件)这儿创建的是组合查询(也叫多条件查询),后面会介绍更多的查询方法
         /*组合查询BoolQueryBuilder
@@ -77,7 +77,7 @@ public class PositionController {
         nativeSearchQueryBuilder.withQuery(builder);
         nativeSearchQueryBuilder.withSort(SortBuilders.scoreSort().order(SortOrder.DESC));
         //将分页设置到构建中
-        //nativeSearchQueryBuilder.withPageable(page);
+        nativeSearchQueryBuilder.withPageable(page);
 
         //生产NativeSearchQuery
         NativeSearchQuery query = nativeSearchQueryBuilder.build();

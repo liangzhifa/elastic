@@ -1,37 +1,26 @@
 package com.zhifa.elastic.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.zhifa.elastic.domain.Policy;
 import com.zhifa.elastic.repository.PolicyRepository;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.common.text.Text;
+import com.zhifa.elastic.vo.PageResult;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.core.SearchResultMapper;
-import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
-import org.springframework.data.elasticsearch.core.aggregation.impl.AggregatedPageImpl;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @RestController
 public class PolicyController {
@@ -42,8 +31,10 @@ public class PolicyController {
     @Autowired
     private PolicyRepository policyRepository;
 
-    @RequestMapping("/policy/{data}")
-    public Object getData(@PathVariable(value = "data") String data) {
+    @RequestMapping("/policy/{data}/{page}/{size}")
+    public Object getData(@PathVariable(value = "data") String data,
+                          @PathVariable(value = "page") Integer page,
+                          @PathVariable(value = "size") Integer size) {
 
         //1.创建QueryBuilder(即设置查询条件)这儿创建的是组合查询(也叫多条件查询),后面会介绍更多的查询方法
         /*组合查询BoolQueryBuilder
@@ -57,8 +48,8 @@ public class PolicyController {
 
         //builder下有must、should以及mustNot 相当于sql中的and、or以及not
         //组合查询，boost即为权重，数值越大，权重越大
-         //builder.should(QueryBuilders.matchPhraseQuery("title",data).boost(30));
-         //builder.should(QueryBuilders.matchQuery("content",data).boost(1));
+        //builder.should(QueryBuilders.matchPhraseQuery("title",data).boost(30));
+        //builder.should(QueryBuilders.matchQuery("content",data).boost(1));
         //模糊查询常见的5个方法如下
         //1.常用的字符串查询
         //QueryBuilders.queryStringQuery("fieldValue").field("fieldName");//左右模糊
@@ -91,18 +82,19 @@ public class PolicyController {
          * （注：在bool query中minimum_should_match只能紧跟在should的后面，放其他地方会出异常）
          *
          */
-        builder.should(QueryBuilders.queryStringQuery(data).field("title").minimumShouldMatch("75%").boost(2f));
+        //builder.should(QueryBuilders.queryStringQuery(data).field("title").minimumShouldMatch("50%").boost(2f));
+        builder.should(QueryBuilders.queryStringQuery(data).field("title").minimumShouldMatch("50%").boost(2f));
         //builder.should(QueryBuilders.);
         builder.should(QueryBuilders.queryStringQuery(data).field("content").minimumShouldMatch("75%").boost(1f));
        /* BoolQueryBuilder b2 = QueryBuilders.boolQuery();
         builder.should(b2);*/
-       // builder.should(QueryBuilders.queryStringQuery(data).field("content").boost(1));
+        // builder.should(QueryBuilders.queryStringQuery(data).field("content").boost(1));
         //builder.should(QueryBuilders.wildcardQuery("title", data).boost(100));
         //builder.filter(QueryBuilders.)
         //添加查询的字段内容
         String[] fileds = {"title", "content"};
 
-       // builder.should(QueryBuilders.multiMatchQuery(data, fileds));
+        // builder.should(QueryBuilders.multiMatchQuery(data, fileds));
 
 
         // 高亮设置
@@ -122,7 +114,7 @@ public class PolicyController {
 
         //设置分页(从第一页开始，一页显示10条)
         //注意开始是从0开始，有点类似sql中的方法limit 的查询
-        //PageRequest page = PageRequest.of(0, 20);
+        PageRequest pageRequest = PageRequest.of(page - 1, size);
 
 
         //按照日期排序
@@ -143,9 +135,7 @@ public class PolicyController {
         nativeSearchQueryBuilder.withSort(SortBuilders.fieldSort("publish").order(SortOrder.DESC));
         //nativeSearchQueryBuilder.withHighlightBuilder();
         //将分页设置到构建中
-        //nativeSearchQueryBuilder.withPageable(page);
-
-
+        nativeSearchQueryBuilder.withPageable(pageRequest);
 
 
         //生产NativeSearchQuery
@@ -196,20 +186,9 @@ public class PolicyController {
 */
 
 
-
-
-
-
-
-
-
-
-
-
-
         Page<Policy> policyPage = policyRepository.search(query);
 
-       // List<Policy> policies = policyPage.get().collect(Collectors.toList());
+        // List<Policy> policies = policyPage.get().collect(Collectors.toList());
 
        /* AggregatedPage<Policy> policyAggregatedPage = elasticsearchTemplate.queryForPage(query, Policy.class, new SearchResultMapper() {
 
@@ -234,10 +213,21 @@ public class PolicyController {
         List<Policy> content = policyAggregatedPage.getContent();*/
 
 
+        List<Policy> content = policyPage.getContent();
+        long totalElements = policyPage.getTotalElements();
 
 
-        return policyPage;
+        return new PageResult(totalElements, content);
 
+    }
+
+
+    @GetMapping("/policy/{id}")
+    public Object getPolicyById(@PathVariable(value = "id") Long id) {
+
+        Optional<Policy> policyOptional = policyRepository.findById(id);
+        Policy policy = policyOptional.get();
+        return policy;
     }
 
 }
