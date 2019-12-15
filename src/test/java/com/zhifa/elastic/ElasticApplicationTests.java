@@ -1,5 +1,6 @@
 package com.zhifa.elastic;
 
+import com.zhifa.elastic.domain.City;
 import com.zhifa.elastic.domain.Info;
 import com.zhifa.elastic.entity.Item;
 import com.zhifa.elastic.repository.InfoRepository;
@@ -59,6 +60,8 @@ public class ElasticApplicationTests {
         // 配置映射，会根据Item类中的id、Field等字段来自动完成映射
         elasticsearchTemplate.putMapping(Info.class);
     }
+
+
 
     /**
      * 删除索引

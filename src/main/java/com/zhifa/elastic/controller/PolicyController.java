@@ -2,7 +2,6 @@ package com.zhifa.elastic.controller;
 
 import com.zhifa.elastic.domain.Policy;
 import com.zhifa.elastic.repository.PolicyRepository;
-import com.zhifa.elastic.vo.PageResult;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -217,7 +216,8 @@ public class PolicyController {
         long totalElements = policyPage.getTotalElements();
 
 
-        return new PageResult(totalElements, content);
+       // return new PageResult(totalElements, content);
+        return policyPage;
 
     }
 

@@ -33,6 +33,8 @@ public class Info {
     @TableField(value = "url")
     private String url;
 
+
+
     public static final String COL_ID = "id";
 
     public static final String COL_KEYWORD = "keyword";
