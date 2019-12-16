@@ -3,6 +3,7 @@ package com.zhifa.elastic.controller;
 import com.zhifa.elastic.domain.Position;
 import com.zhifa.elastic.repository.PolicyRepository;
 import com.zhifa.elastic.repository.PositionRepository;
+import com.zhifa.elastic.vo.PageResult;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.sort.SortBuilders;
@@ -16,6 +17,7 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilde
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -31,7 +33,9 @@ public class PositionController {
     private PositionRepository positionRepository;
 
     @PostMapping("/position")
-    public Object getData(@RequestBody Position position) {
+    public Object getData(@RequestBody Position position,
+                          @RequestParam(value = "page") Integer page,
+                          @RequestParam(value = "size") Integer size) {
 
         /*
         *
@@ -47,7 +51,7 @@ public class PositionController {
 
         //设置分页(从第一页开始，一页显示10条)
         //注意开始是从0开始，有点类似sql中的方法limit 的查询
-        PageRequest page = PageRequest.of(0, 20);
+        PageRequest pageRequest = PageRequest.of(page - 1, size);
 
         //1.创建QueryBuilder(即设置查询条件)这儿创建的是组合查询(也叫多条件查询),后面会介绍更多的查询方法
         /*组合查询BoolQueryBuilder
@@ -56,6 +60,7 @@ public class PositionController {
          * should:               :OR
          */
         BoolQueryBuilder builder = QueryBuilders.boolQuery();
+        //builder.should(QueryBuilders.boolQuery());
         if (!StringUtils.isEmpty(position.getPosition())) {
             builder.must(QueryBuilders.queryStringQuery(position.getPosition()).field("position"));
         }
@@ -70,14 +75,17 @@ public class PositionController {
             builder.must(QueryBuilders.rangeQuery("pricemin").lte(position.getPricemax()));
         }
 
+        /*QueryBuilders.termsQuery(, );*/
+
 
         //2.构建查询
         NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
         //将搜索条件设置到构建中
         nativeSearchQueryBuilder.withQuery(builder);
+
         nativeSearchQueryBuilder.withSort(SortBuilders.scoreSort().order(SortOrder.DESC));
         //将分页设置到构建中
-        nativeSearchQueryBuilder.withPageable(page);
+        nativeSearchQueryBuilder.withPageable(pageRequest);
 
         //生产NativeSearchQuery
         NativeSearchQuery query = nativeSearchQueryBuilder.build();
@@ -88,7 +96,8 @@ public class PositionController {
 
         Page<Position> positions = positionRepository.search(query);
 
-        return positions;
+
+        return new PageResult(positions.getTotalElements(), positions.getContent());
     }
 
 }

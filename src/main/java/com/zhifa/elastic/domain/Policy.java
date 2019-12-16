@@ -46,6 +46,12 @@ public class Policy implements Serializable {
     @TableField(value = "url")
     private String url;
 
+
+    /**
+     *  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+     *     @JsonFormat(shape =JsonFormat.Shape.STRING,pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+     *     @Field(type = FieldType.Date,format = DateFormat.custom,pattern ="yyyy-MM-dd HH:mm:ss" )
+     */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Field(type = FieldType.Date)

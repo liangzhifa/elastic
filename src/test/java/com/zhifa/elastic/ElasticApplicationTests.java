@@ -2,9 +2,11 @@ package com.zhifa.elastic;
 
 import com.zhifa.elastic.domain.City;
 import com.zhifa.elastic.domain.Info;
+import com.zhifa.elastic.domain.TagsInfo;
 import com.zhifa.elastic.entity.Item;
 import com.zhifa.elastic.repository.InfoRepository;
 import com.zhifa.elastic.repository.ItemRepository;
+import com.zhifa.elastic.repository.TagsRepository;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
@@ -36,8 +38,12 @@ public class ElasticApplicationTests {
 
     @Autowired
     private ItemRepository itemRepository;
+
     @Autowired
     private InfoRepository infoRepository;
+
+    @Autowired
+    private TagsRepository tagsRepository;
 
     /**
      * 创建索引
@@ -62,6 +68,31 @@ public class ElasticApplicationTests {
     }
 
 
+
+    /**
+     * 创建索引
+     */
+    @Test
+    public void createTagsIndex() {
+        // 创建索引，会根据Item类的@Document注解信息来创建
+        elasticsearchTemplate.createIndex(TagsInfo.class);
+        // 配置映射，会根据Item类中的id、Field等字段来自动完成映射
+        elasticsearchTemplate.putMapping(TagsInfo.class);
+    }
+
+    @Test
+    public void addTags(){
+        TagsInfo tagsInfo = new TagsInfo();
+        tagsInfo.setId(2L);
+        List<String> tags = new ArrayList<>();
+        tags.add("数据服务");
+        tags.add("医疗健康");
+
+        tagsInfo.setTags(tags);
+
+        TagsInfo save = tagsRepository.save(tagsInfo);
+        System.out.println(save);
+    }
 
     /**
      * 删除索引
